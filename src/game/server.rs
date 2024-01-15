@@ -4,6 +4,7 @@ use bevy::ecs::system::Resource;
 use reqwest::{Client, Error};
 use serde::{Deserialize, Serialize};
 
+// ユーザーの構造体
 #[derive(Serialize, Deserialize, Debug, Clone, Resource)]
 pub struct User {
     #[serde(rename = "_name")]
