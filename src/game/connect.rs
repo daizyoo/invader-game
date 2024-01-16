@@ -2,7 +2,7 @@ use std::{
     io::Read,
     net::{IpAddr, TcpListener},
     str::from_utf8,
-    sync::mpsc,
+    sync::mpsc::channel,
     thread,
     time::Duration,
 };
@@ -76,9 +76,9 @@ fn wait(
     // 相手の情報を受け取るサーバー
     let ip = room.user.ip.to_string();
 
-    let (user_s, user_r) = mpsc::channel();
-    let (state_s, state_r) = mpsc::channel();
-    let (game_state_s, game_state_r) = mpsc::channel();
+    let (user_s, user_r) = channel();
+    let (state_s, state_r) = channel();
+    let (game_state_s, game_state_r) = channel();
 
     thread::spawn(move || {
         let server = TcpListener::bind((ip, 8888)).expect("サーバーエラー");
@@ -104,25 +104,18 @@ fn wait(
             }
             Err(e) => eprintln!("{}", e),
         }
-    });
+    })
+    .join()
+    .unwrap();
 
-    loop {
-        if let Ok(user) = user_r.recv_timeout(RECV_TIMEOUT) {
-            commands.insert_resource(user);
-            break;
-        }
+    if let Ok(user) = user_r.recv_timeout(RECV_TIMEOUT) {
+        commands.insert_resource(user);
     }
-    loop {
-        if let Ok(s) = state_r.recv_timeout(RECV_TIMEOUT) {
-            connect_state.set(s);
-            break;
-        }
+    if let Ok(s) = state_r.recv_timeout(RECV_TIMEOUT) {
+        connect_state.set(s);
     }
-    loop {
-        if let Ok(s) = game_state_r.recv_timeout(RECV_TIMEOUT) {
-            game_state.set(s);
-            break;
-        }
+    if let Ok(s) = game_state_r.recv_timeout(RECV_TIMEOUT) {
+        game_state.set(s);
     }
 
     println!("end server...");

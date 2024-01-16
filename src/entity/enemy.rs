@@ -177,20 +177,19 @@ impl EnemyAttackBundle {
     }
 }
 
+type EnemyQuery = (
+    Entity,
+    &'static Transform,
+    Option<&'static mut Enemy>,
+    Option<&'static mut EnemyAttack>,
+);
+
 // 敵のダメージ判定
 #[inline]
 pub fn enemy_collision<T, A>(
     mut commands: Commands,
     mut player_query: Query<&mut T>,
-    mut enemy_query: Query<
-        (
-            Entity,
-            &Transform,
-            Option<&mut Enemy>,
-            Option<&mut EnemyAttack>,
-        ),
-        With<EnemyCollider>,
-    >,
+    mut enemy_query: Query<EnemyQuery, With<EnemyCollider>>,
     mut attack_query: Query<(Entity, &Transform, &mut A), With<A>>,
     mut update_info_event: EventWriter<UpdateInfo>,
 ) where
