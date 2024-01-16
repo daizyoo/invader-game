@@ -108,7 +108,7 @@ fn main_menu_setup(mut commands: Commands, font: Res<FontResource>) {
 }
 
 fn menu_button_system(
-    interaction_query: Query<(&Interaction, &MainMenuButton), (Changed<Interaction>, With<Button>)>,
+    interaction_query: Query<(&Interaction, &MainMenuButton), Changed<Interaction>>,
     mut main_state: ResMut<NextState<MainState>>,
     mut menu_state: ResMut<NextState<MenuState>>,
     mut app_exit_event: EventWriter<AppExit>,

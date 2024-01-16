@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use bevy::prelude::*;
 
 use bevy::sprite::collide_aabb::collide;
@@ -82,22 +84,22 @@ impl EnemyType {
     #[inline]
     const fn hp(&self) -> isize {
         match self {
-            EnemyType::Normal => 25,
-            EnemyType::Drop => 30,
+            EnemyType::Normal => 15,
+            EnemyType::Drop => 8,
         }
     }
     #[inline]
     pub const fn speed(&self) -> f32 {
         match self {
             EnemyType::Normal => 0.0,
-            EnemyType::Drop => 250.0,
+            EnemyType::Drop => 300.0,
         }
     }
     #[inline]
     const fn scale(&self) -> Vec2 {
         match self {
             EnemyType::Normal => Vec2::new(50., 40.),
-            EnemyType::Drop => Vec2::new(30., 40.),
+            EnemyType::Drop => Vec2::new(20., 30.),
         }
     }
     #[inline]
@@ -163,7 +165,7 @@ impl EnemyAttackBundle {
                     ..default()
                 },
                 sprite: Sprite {
-                    custom_size: Some(Vec2::new(2., 2.)),
+                    custom_size: Some(attack.custom_scale()),
                     ..default()
                 },
                 texture,
@@ -227,17 +229,19 @@ pub fn enemy_collision<T, A>(
                     let enemy_attack_hp = enemy_attack.0.hp;
                     let player_attack_hp = player_attack.hp();
 
-                    if enemy_attack_hp < player_attack_hp {
-                        player_attack.damage(enemy_attack_hp);
-
-                        commands.entity(enemy_entity).despawn();
-                    } else if player_attack_hp < enemy_attack_hp {
-                        enemy_attack.0.damage(player_attack_hp);
-
-                        commands.entity(player_attack_entity).despawn();
-                    } else {
-                        commands.entity(enemy_entity).despawn();
-                        commands.entity(player_attack_entity).despawn();
+                    match player_attack_hp.cmp(&enemy_attack_hp) {
+                        Ordering::Greater => {
+                            player_attack.damage(enemy_attack_hp);
+                            commands.entity(enemy_entity).despawn();
+                        }
+                        Ordering::Less => {
+                            enemy_attack.0.damage(player_attack_hp);
+                            commands.entity(player_attack_entity).despawn();
+                        }
+                        Ordering::Equal => {
+                            commands.entity(enemy_entity).despawn();
+                            commands.entity(player_attack_entity).despawn();
+                        }
                     }
                 }
             }
@@ -270,8 +274,9 @@ fn enemy_attack(
     enemy_query: Query<&Transform, With<Enemy>>,
 ) {
     for transform in &enemy_query {
+        // 敵のタイプによってAttackTypeを変える
         commands.spawn(EnemyAttackBundle::new(
-            AttackType::Normal,
+            AttackType::EnemyNormal,
             texture.enemy_attack.clone(),
             transform.translation,
         ));

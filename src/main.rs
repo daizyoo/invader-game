@@ -1,5 +1,5 @@
 use bevy::{audio::VolumeLevel, prelude::*};
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+// use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 mod entity;
 mod game;
@@ -41,12 +41,15 @@ fn main() {
         .add_state::<MainState>()
         .add_event::<SoundEvent>()
         .add_systems(Startup, setup)
-        .add_systems(Update, (sound_event, background_move))
+        .add_systems(
+            Update,
+            (sound_event, background_move, bevy::window::close_on_esc),
+        )
         .add_plugins((
             menu::MenuPlugin,
             game::GamePlugin,
             game::GameOver,
-            WorldInspectorPlugin::new(),
+            // WorldInspectorPlugin::new(),
             bevy_simple_text_input::TextInputPlugin,
         ))
         .run();

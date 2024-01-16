@@ -87,10 +87,7 @@ enum GameOverButtonAction {
 }
 
 fn game_over_button_system(
-    interaction_query: Query<
-        (&Interaction, &GameOverButtonAction),
-        (Changed<Interaction>, With<Button>),
-    >,
+    interaction_query: Query<(&Interaction, &GameOverButtonAction), Changed<Interaction>>,
     mut main_state: ResMut<NextState<MainState>>,
     mut menu_state: ResMut<NextState<MenuState>>,
     mut app_exit_event: EventWriter<AppExit>,
@@ -109,27 +106,16 @@ fn game_over_button_system(
     }
 }
 
+type DespawnType<E, Attack> = Or<(
+    With<E>,
+    With<Attack>,
+    With<EnemyCollider>,
+    With<PlayerInfoScreen>,
+)>;
+
 pub fn entity_despawn<E: Component, Attack: Component>(
     mut commands: Commands,
-    entity_query: Query<
-        Entity,
-        Or<(
-            With<E>,
-            With<Attack>,
-            With<EnemyCollider>,
-            With<PlayerInfoScreen>,
-            // With<SinglePlayer>,
-            // With<SinglePlayerAttack>,
-            // With<Player1>,
-            // With<PlayerAttack1>,
-            // With<Player2>,
-            // With<PlayerAttack2>,
-            // With<My>,
-            // With<MyAttack>,
-            // With<Opponent>,
-            // With<OpponentAttack>,
-        )>,
-    >,
+    entity_query: Query<Entity, DespawnType<E, Attack>>,
     mut game_mode: ResMut<NextState<GameMode>>,
 ) {
     game_mode.set(GameMode::Disabled);

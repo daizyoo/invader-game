@@ -14,6 +14,7 @@ use std::time::Duration;
 use bevy::app::PluginGroupBuilder;
 use bevy::prelude::*;
 
+use self::AttackType::*;
 use crate::entity::{AttackMethod, DamageEventMethod, EnemyPlugin, PlayerMethod, PlayerPlugin};
 use crate::game_mode::*;
 
@@ -118,6 +119,11 @@ impl<P: Clone, A: Clone, E: Clone> Default for PluginSetting<P, A, E> {
     }
 }
 
+/// #Example
+///
+/// #[derive(Component, Clone, PartialEq)]
+/// struct PlayerAttack(Attack);
+///
 #[derive(Component, Clone, Copy, PartialEq)]
 pub struct Attack {
     pub hp: isize,
@@ -134,6 +140,7 @@ pub enum AttackType {
     Shotgun4,
     Shotgun5,
     Rebound(bool),
+    EnemyNormal,
 }
 
 impl Attack {
@@ -152,62 +159,61 @@ impl Attack {
 
 impl AttackType {
     #[inline]
+    pub fn custom_scale(&self) -> Vec2 {
+        match self {
+            Power => Vec2::new(4., 4.),
+            _ => Vec2::new(2., 2.),
+        }
+    }
+    #[inline]
     pub const fn scale(&self) -> Vec2 {
         match self {
-            AttackType::Normal => Vec2::new(20., 20.),
-            AttackType::Power => Vec2::new(20., 20.),
-            AttackType::Shotgun
-            | AttackType::Shotgun2
-            | AttackType::Shotgun3
-            | AttackType::Shotgun4
-            | AttackType::Shotgun5 => Vec2::new(20., 20.),
-            AttackType::Rebound(_) => Vec2::new(30., 30.),
+            Normal => Vec2::new(20., 20.),
+            Power => Vec2::new(40., 40.),
+            Shotgun | Shotgun2 | Shotgun3 | Shotgun4 | Shotgun5 => Vec2::new(20., 20.),
+            Rebound(_) => Vec2::new(20., 20.),
+            EnemyNormal => Vec2::new(20., 20.),
         }
     }
     #[inline]
     pub const fn power(&self) -> isize {
         match self {
-            AttackType::Normal => 4,
-            AttackType::Power => 20,
-            AttackType::Shotgun => 7,
-            AttackType::Shotgun2 => 7,
-            AttackType::Shotgun3 => 9,
-            AttackType::Shotgun4 => 7,
-            AttackType::Shotgun5 => 7,
-            AttackType::Rebound(_) => 10,
+            Normal => 11,
+            Power => 20,
+            Shotgun => 4,
+            Shotgun2 => 5,
+            Shotgun3 => 6,
+            Shotgun4 => 5,
+            Shotgun5 => 4,
+            Rebound(_) => 8,
+            EnemyNormal => 3,
         }
     }
     #[inline]
     pub const fn y_speed(&self) -> f32 {
         match self {
-            AttackType::Rebound(_) => 2.0,
+            Rebound(_) => 2.0,
             _ => 15.0,
         }
     }
     #[inline]
     pub const fn x_speed(&self) -> f32 {
         match self {
-            AttackType::Shotgun => 3.0,
-            AttackType::Shotgun2 => 7.0,
-            AttackType::Shotgun3 => 0.0,
-            AttackType::Shotgun4 => -7.0,
-            AttackType::Shotgun5 => -3.0,
-            AttackType::Rebound(true) => 10.0,
-            AttackType::Rebound(false) => -10.0,
+            Shotgun => 3.0,
+            Shotgun2 => 7.0,
+            Shotgun3 => 0.0,
+            Shotgun4 => -7.0,
+            Shotgun5 => -3.0,
+            Rebound(true) => 10.0,
+            Rebound(false) => -10.0,
             _ => 0.0,
         }
     }
     #[inline]
     pub fn list(&self) -> Vec<AttackType> {
         match &self {
-            AttackType::Shotgun => vec![
-                AttackType::Shotgun,
-                AttackType::Shotgun2,
-                AttackType::Shotgun3,
-                AttackType::Shotgun4,
-                AttackType::Shotgun5,
-            ],
-            AttackType::Rebound(_) => vec![AttackType::Rebound(false), AttackType::Rebound(true)],
+            Shotgun => vec![Shotgun, Shotgun2, Shotgun3, Shotgun4, Shotgun5],
+            Rebound(_) => vec![Rebound(false), Rebound(true)],
             _ => vec![*self],
         }
     }

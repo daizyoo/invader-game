@@ -237,11 +237,7 @@ fn focus(
     for (interaction_entity, interaction) in &query {
         if *interaction == Interaction::Pressed {
             for (entity, mut text_input) in &mut text_input_query {
-                if entity == interaction_entity {
-                    text_input.inactive = false
-                } else {
-                    text_input.inactive = true
-                }
+                text_input.inactive = entity != interaction_entity;
             }
         }
     }
@@ -276,7 +272,7 @@ enum ConnectSection {
 
 fn connect_button_system(
     mut commands: Commands,
-    interaction: Query<(&Interaction, &ConnectSection), (Changed<Interaction>, With<Button>)>,
+    interaction: Query<(&Interaction, &ConnectSection), Changed<Interaction>>,
     room: Res<RoomRequest>,
     mut connect_state: ResMut<NextState<ConnectState>>,
     mut game_state: ResMut<NextState<GameMode>>,

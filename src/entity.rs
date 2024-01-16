@@ -4,6 +4,18 @@ mod player;
 pub use enemy::*;
 pub use player::*;
 
+/// #Examples
+///
+/// #[derive(Event, Clone)]
+/// struct SinglePlayerEvent {
+///     attack: AttackType,
+/// }
+/// #[derive(Component, Clone, PartialEq)]
+/// pub struct SinglePlayerAttack(Attack);
+/// #[derive(Component, Default, Clone)]
+/// pub struct SinglePlayer(Player);
+///
+/// method_impl!(SinglePlayer, SinglePlayerAttack, SinglePlayerEvent);
 #[macro_export]
 macro_rules! method_impl {
     ($player:ty, $attack:ty, $event:ty) => {
@@ -50,6 +62,23 @@ macro_rules! method_impl {
             }
             fn event(attack: AttackType) -> Self {
                 Self { attack }
+            }
+        }
+    };
+    ($player:ty, $attack:ty) => {
+        impl AttackMethod for $attack {
+            #[inline]
+            fn new(attack: AttackType) -> Self {
+                Self(Attack::new(attack))
+            }
+            fn attack(&self) -> AttackType {
+                self.0.attack
+            }
+            fn hp(&self) -> isize {
+                self.0.hp
+            }
+            fn damage(&mut self, damage: isize) {
+                self.0.hp -= damage
             }
         }
     };

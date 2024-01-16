@@ -107,7 +107,7 @@ impl<P: Component + PlayerMethod> PlayerBundle<P> {
     }
 }
 
-impl<A: Component> PlayerAttackBundle<A> {
+impl<A: Component + AttackMethod> PlayerAttackBundle<A> {
     #[inline]
     pub fn new(attack: A, texture: Texture, translation: Vec3) -> PlayerAttackBundle<A> {
         PlayerAttackBundle {
@@ -116,11 +116,11 @@ impl<A: Component> PlayerAttackBundle<A> {
                     // TODO: プレイヤーの中心ではなく少し前でスポーンさせるようにする
                     // 引数で誤差を受け取る
                     translation,
-                    scale: Vec3::new(20., 20., 0.),
+                    scale: attack.attack().scale().extend(0.),
                     ..default()
                 },
                 sprite: Sprite {
-                    custom_size: Some(Vec2::new(2., 2.)),
+                    custom_size: Some(attack.attack().custom_scale()),
                     ..default()
                 },
                 texture,
@@ -158,14 +158,18 @@ fn player_damage_event<P, E>(
     }
 }
 
+type EnemyQuery = (
+    Entity,
+    &'static Transform,
+    Option<&'static Enemy>,
+    Option<&'static EnemyAttack>,
+);
+
 // プレイヤーのダメージ判定
 fn player_collision<P, E>(
     mut commands: Commands,
     player_query: Query<&Transform, With<P>>,
-    collider_query: Query<
-        (Entity, &Transform, Option<&Enemy>, Option<&EnemyAttack>),
-        With<EnemyCollider>,
-    >,
+    collider_query: Query<EnemyQuery, With<EnemyCollider>>,
     mut damage_event: EventWriter<E>,
     mut main_state: ResMut<NextState<MainState>>,
     mut game_mode: ResMut<NextState<GameMode>>,
@@ -194,7 +198,7 @@ fn player_collision<P, E>(
             if let Some(attack) = attack {
                 commands.entity(collider_entity).despawn();
 
-                damage_event.send(E::event(attack.0.attack.clone()));
+                damage_event.send(E::event(attack.0.attack));
             }
         }
     }
@@ -238,7 +242,6 @@ pub fn player_attack<P, A>(
     mut commands: Commands,
     player_query: Query<(&Transform, &P)>,
     texture: Res<TextureResource>,
-    _key: Res<Input<KeyCode>>,
     mut sound_event: EventWriter<SoundEvent>,
 ) where
     P: Component + PlayerMethod,
@@ -310,6 +313,7 @@ fn attack_change<P: Component + PlayerMethod>(
                 _ => time.set_timestep(Duration::from_secs_f32(0.13)),
             }
             player.change_attack(attack_type);
+
             NEXT_ATTACK += 1;
             if NEXT_ATTACK == ATTACK_LIST_LEN {
                 NEXT_ATTACK = 0;

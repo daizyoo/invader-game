@@ -8,8 +8,8 @@ use bevy::sprite::collide_aabb::collide;
 use bevy::time::common_conditions::on_timer;
 use local_ip_address::local_ip;
 
-use crate::entity::PlayerAttackBundle;
-use crate::game::*;
+use crate::entity::{AttackMethod, PlayerAttackBundle};
+use crate::{game::*, method_impl};
 use crate::{Audio, FontResource, SoundEvent, TextureResource};
 
 const INITIAL_OPPONENT_POSITION: Vec2 = Vec2::new(0., 350.);
@@ -92,10 +92,10 @@ struct My;
 struct Opponent;
 
 #[derive(Component)]
-struct MyAttack;
+struct MyAttack(Attack);
 
 #[derive(Component)]
-struct OpponentAttack;
+struct OpponentAttack(Attack);
 
 impl Default for Player {
     fn default() -> Self {
@@ -381,7 +381,7 @@ fn player_attack(
         server.attack_send(format!("{} {}", x, y).as_bytes());
 
         commands.spawn(PlayerAttackBundle::new(
-            MyAttack,
+            MyAttack::new(AttackType::Power),
             texture.player_attack.clone(),
             translation,
         ));
@@ -397,7 +397,7 @@ fn opponent_attack(mut commands: Commands, texture: Res<TextureResource>, server
         return;
     };
     commands.spawn(PlayerAttackBundle::new(
-        OpponentAttack,
+        OpponentAttack::new(AttackType::Normal),
         texture.player_attack.clone(),
         to_pos(&buf[..buf_size]),
     ));
@@ -482,3 +482,6 @@ fn hp_recv(mut game: ResMut<Game>, server: Res<Server>, mut event: EventWriter<I
 
     event.send(game.info());
 }
+
+method_impl!(My, MyAttack);
+method_impl!(Opponent, OpponentAttack);

@@ -87,7 +87,7 @@ pub fn game_menu_setup(mut commands: Commands, font: Res<FontResource>) {
 }
 
 pub fn game_menu_system(
-    interaction: Query<(&Interaction, &GameMode), (Changed<Interaction>, With<Button>)>,
+    interaction: Query<(&Interaction, &GameMode), Changed<Interaction>>,
     mut game_mode: ResMut<NextState<GameMode>>,
 ) {
     for (interaction, mode) in &interaction {

@@ -21,9 +21,9 @@ impl Plugin for SinglePlay {
             .add_plugins(
                 GamePlayPlugin::<SinglePlayer, SinglePlayerAttack, SinglePlayerEvent> {
                     setting: PluginSetting {
-                        player_attack_timer: Duration::from_secs_f32(0.18),
-                        enemy_attack_timer: Duration::from_secs_f32(0.7),
-                        enemy_create_timer: Duration::from_secs_f32(4.0),
+                        player_attack_timer: Duration::from_secs_f32(0.15),
+                        enemy_attack_timer: Duration::from_secs_f32(0.8),
+                        enemy_create_timer: Duration::from_secs_f32(3.6),
                         in_state: GameMode::Single,
                         ..default()
                     },
