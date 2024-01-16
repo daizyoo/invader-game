@@ -6,13 +6,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Resource)]
 pub struct User {
-    #[serde(rename = "_name")]
     pub name: String,
-    #[serde(rename = "_ip")]
     pub ip: IpAddr,
     // delta_seconds()を平均した数
     // どれくらいの間隔で座標を送ればいいか
-    #[serde(rename = "_delta_seconds")]
     pub delta_seconds: f32,
 }
 
