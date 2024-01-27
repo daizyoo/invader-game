@@ -11,7 +11,7 @@ pub const WINDOW_HEIGHT: f32 = 1050.0;
 
 const BACKGROUND_DESPAWN_POINT: f32 = -WINDOW_HEIGHT + 40.;
 const BACKGROUND_SPAWN_POINT: f32 = WINDOW_HEIGHT;
-const BACKGROUND_SPEED: f32 = 1.0;
+const BACKGROUND_SPEED: f32 = 40.0;
 
 type Sound = Handle<AudioSource>;
 pub type Texture = Handle<Image>;
@@ -152,9 +152,12 @@ fn sound_event(
     }
 }
 
-fn background_move(mut background_query: Query<&mut Transform, With<BackgroundScreen>>) {
+fn background_move(
+    mut background_query: Query<&mut Transform, With<BackgroundScreen>>,
+    time: Res<Time>,
+) {
     for mut transform in &mut background_query {
-        transform.translation.y -= BACKGROUND_SPEED;
+        transform.translation.y -= BACKGROUND_SPEED * time.delta_seconds();
         if transform.translation.y <= BACKGROUND_DESPAWN_POINT {
             transform.translation.y = BACKGROUND_SPAWN_POINT;
         }

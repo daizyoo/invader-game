@@ -192,20 +192,20 @@ impl AttackType {
     #[inline]
     pub const fn y_speed(&self) -> f32 {
         match self {
-            Rebound(_) => 2.0,
-            _ => 15.0,
+            Rebound(_) => 150.0,
+            _ => 170.0,
         }
     }
     #[inline]
     pub const fn x_speed(&self) -> f32 {
         match self {
-            Shotgun => 3.0,
-            Shotgun2 => 7.0,
+            Shotgun => 300.0,
+            Shotgun2 => 340.0,
             Shotgun3 => 0.0,
-            Shotgun4 => -7.0,
-            Shotgun5 => -3.0,
-            Rebound(true) => 10.0,
-            Rebound(false) => -10.0,
+            Shotgun4 => -340.0,
+            Shotgun5 => -340.0,
+            Rebound(true) => 100.0,
+            Rebound(false) => -100.0,
             _ => 0.0,
         }
     }

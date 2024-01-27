@@ -264,14 +264,15 @@ pub fn player_attack<P, A>(
 pub fn move_player_attack<A>(
     mut commands: Commands,
     mut attack_query: Query<(Entity, &mut Transform, &mut A), With<A>>,
+    time: Res<Time>,
 ) where
     A: Component + AttackMethod + Clone + PartialEq,
 {
     for (entity, mut transform, mut attack) in &mut attack_query {
         let attack_type = attack.attack();
 
-        transform.translation.y += attack_type.y_speed();
-        transform.translation.x += attack_type.x_speed();
+        transform.translation.y += attack_type.y_speed() * time.delta_seconds();
+        transform.translation.x += attack_type.x_speed() * time.delta_seconds();
 
         let translation = transform.translation;
 
