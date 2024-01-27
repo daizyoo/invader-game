@@ -6,6 +6,7 @@ pub use player::*;
 
 /// #Examples
 ///
+/// ```
 /// #[derive(Event, Clone)]
 /// struct SinglePlayerEvent {
 ///     attack: AttackType,
@@ -16,6 +17,7 @@ pub use player::*;
 /// pub struct SinglePlayer(Player);
 ///
 /// method_impl!(SinglePlayer, SinglePlayerAttack, SinglePlayerEvent);
+/// ```
 #[macro_export]
 macro_rules! method_impl {
     ($player:ty, $attack:ty, $event:ty) => {

@@ -121,9 +121,10 @@ impl<P: Clone, A: Clone, E: Clone> Default for PluginSetting<P, A, E> {
 
 /// #Example
 ///
+/// ```
 /// #[derive(Component, Clone, PartialEq)]
 /// struct PlayerAttack(Attack);
-///
+/// ```
 #[derive(Component, Clone, Copy, PartialEq)]
 pub struct Attack {
     pub hp: isize,
